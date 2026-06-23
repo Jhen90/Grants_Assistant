@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+
+# Conda / Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+.conda/
+conda-env/
+
+# Environment / Secrets
+.env
+*.env.local
+*.env.*.local
+google_credentials.json
+data/google_credentials.json
+
+# Database
+data/gmas.db
+data/backups/
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Logs
+logs/
+*.log
+
+# Exports (generated at runtime)
+data/exports/
+
+# IDE
+.vscode/
+*.code-workspace
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Alembic (keep migrations, not pycache)
+src/db/migrations/__pycache__/
+
+# Test artifacts
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
