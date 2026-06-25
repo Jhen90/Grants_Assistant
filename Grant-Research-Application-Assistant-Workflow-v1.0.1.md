@@ -1,6 +1,9 @@
 
 # Grant Assistant Product Definition Document ROUGH PROMPT CONTENT
 
+- created: 2026.06.23 01:26:00 PM EST 
+- modified: 2026.06.25 11:34:00 PM EST 
+
 ## OVERALL ASSISTANT PROCESS FLOW 
 
 Grant Selection Criteria and Rules Editor
@@ -154,6 +157,6 @@ If the user requests a draft narrative for a specific grant, write a compelling 
 Always frame the Dojo's work around equity, youth voice, community safety, and economic mobility.
 
 ## Critical Rule
-**Never apply to a grant without explicit approval.** Always produce the recommendation memo first and wait for the user's direction before taking any application action.
+**Never apply to a grant without explicit approval by the human in the loop.** Always produce the recommendation memo first and wait for the user's direction before taking any application action.
 
 ######################################################################################
