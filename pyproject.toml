@@ -1,0 +1,43 @@
+# ============================================================
+# File: pyproject.toml
+# Version: 1.1.0
+# Created: 2026-06-25
+# Modified: 2026-06-25
+# Description: Project metadata and tool configuration for GMAS
+# ============================================================
+
+[project]
+name = "gmas"
+version = "1.1.0"
+requires-python = ">=3.11"
+description = "Grants Manager Assistant System for The Dojo at Somernova"
+readme = "README.md"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+exclude = ["tests/", "src/db/migrations/"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--tb=short -q"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["src/db/migrations/*", "tests/*"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
