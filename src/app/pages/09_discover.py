@@ -184,10 +184,24 @@ def main() -> None:
                 default=["grants.gov", "web_search"],
                 format_func=lambda s: source_labels[s],
             )
-            if st.button("🔍 Search", type="primary"):
-                with st.spinner("Searching and extracting… (polite rate-limiting may take a moment)"):
-                    staged = svc.run_search(db, query, sources=chosen or None)
-                st.success(f"Staged {len(staged)} candidate(s). See the Review Queue tab.")
+            col_a, col_b = st.columns([1, 1])
+            with col_a:
+                if st.button("🔍 Search this query", type="primary"):
+                    with st.spinner("Searching and extracting… (polite rate-limiting may take a moment)"):
+                        staged = svc.run_search(db, query, sources=chosen or None)
+                    st.success(f"Staged {len(staged)} candidate(s). See the Review Queue tab.")
+            with col_b:
+                if st.button("🌐 Search Everywhere"):
+                    st.caption(
+                        "Expands your org profile into many queries and sweeps all "
+                        "known funders + public portals. This can take a few minutes."
+                    )
+                    with st.spinner("Running full sweep across all sources…"):
+                        staged = svc.run_full_sweep(db, sources=chosen or None)
+                    st.success(
+                        f"Full sweep complete — staged {len(staged)} candidate(s). "
+                        "See the Review Queue tab."
+                    )
 
         # ── Review queue tab ─────────────────────────────────────────────────
         with review_tab:

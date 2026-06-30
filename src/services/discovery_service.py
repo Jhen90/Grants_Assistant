@@ -22,6 +22,7 @@ from sqlalchemy.orm import Session
 from src.db.org_profile_loader import load as load_org_profile
 from src.discovery.base import GrantCandidate
 from src.discovery.fetcher import PoliteFetcher
+from src.discovery.query_expander import expand_queries
 from src.discovery.sources import (
     CandidApiSource,
     FunderSiteSource,
@@ -29,8 +30,10 @@ from src.discovery.sources import (
     InstrumentlCsvImporter,
     WebSearchSource,
 )
+from src.discovery.sources.funder_site import PUBLIC_PORTALS
 from src.engine.deduplication import find_duplicates
 from src.models.discovered_candidate import CandidateStatus, DiscoveredCandidate
+from src.models.funder import Funder
 from src.models.grant import Grant
 from src.services.grant_service import GrantService
 from src.utils.config import get_settings
@@ -78,6 +81,53 @@ class DiscoveryService:
             fetcher.close()
 
         return self._stage_candidates(db, raw, query)
+
+    def run_full_sweep(
+        self,
+        db: Session,
+        sources: list[str] | None = None,
+        limit_per_source: int = 10,
+        max_queries: int = 40,
+        profile_path: str | None = None,
+        sweep_funder_sites: bool = True,
+    ) -> list[DiscoveredCandidate]:
+        """
+        "Search everywhere." Expands the org profile into a battery of queries,
+        runs them across all enabled keyword sources, AND sweeps every known
+        funder website (priority funders + community partners from the DB) plus
+        the curated public grant portals. All results are staged, de-duplicated.
+
+        This is the entry point for the Discover page's "Search Everywhere" button
+        and the scheduled weekly scan (--sweep).
+        """
+        org_profile = load_org_profile(profile_path or self._settings.org_profile_path)
+        queries = expand_queries(org_profile, max_queries=max_queries)
+        log.info("Full sweep: %d expanded queries.", len(queries))
+
+        fetcher = PoliteFetcher()
+        raw: list[GrantCandidate] = []
+        try:
+            # 1) Keyword sources across every expanded query.
+            connectors = self._active_connectors(fetcher, sources)
+            for query in queries:
+                for connector in connectors:
+                    try:
+                        raw.extend(connector.search(query, org_profile, limit_per_source))
+                    except Exception as exc:  # noqa: BLE001
+                        log.warning("Source %s failed on %r: %s", connector.name, query, exc)
+
+            # 2) Sweep every funder website we know + curated public portals.
+            if sweep_funder_sites and self._settings.source_funder_sites_enabled:
+                urls = self._all_known_funder_urls(db) + PUBLIC_PORTALS
+                site_source = FunderSiteSource(fetcher)
+                try:
+                    raw.extend(site_source.sweep_urls(urls, org_profile))
+                except Exception as exc:  # noqa: BLE001
+                    log.warning("Funder-site sweep failed: %s", exc)
+        finally:
+            fetcher.close()
+
+        return self._stage_candidates(db, raw, search_query="FULL_SWEEP")
 
     def fetch_known_url(
         self, db: Session, url: str, profile_path: str | None = None
@@ -219,6 +269,21 @@ class DiscoveryService:
             db.refresh(row)
         log.info("Staged %d candidates for query %r.", len(staged), search_query)
         return staged
+
+    @staticmethod
+    def _all_known_funder_urls(db: Session) -> list[str]:
+        """Websites of every active funder in the DB (priority + community partners)."""
+        funders = (
+            db.query(Funder)
+            .filter(Funder.is_deleted.is_(False), Funder.website.isnot(None))
+            .all()
+        )
+        urls: list[str] = []
+        for f in funders:
+            site = (f.website or "").strip()
+            if site and site.startswith("http"):
+                urls.append(site)
+        return urls
 
     @staticmethod
     def _existing_grants_for_dedup(db: Session) -> list[dict]:

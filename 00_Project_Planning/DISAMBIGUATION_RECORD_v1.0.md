@@ -342,5 +342,31 @@ discovery tests (`test_extractor.py`, `test_aggregator_csv.py`) do pass.
 
 ---
 
+## D-019 — "Search Everywhere" Breadth Strategy (v1.2.0)
+
+**Decision:** User clarified discovery must "search everywhere," not run a single
+query. Needed a strategy to broaden coverage without a paid search API.
+
+**Resolution:** Added `run_full_sweep()` combining three breadth mechanisms:
+1. **Query expansion** (`query_expander.py`) — generates up to 40 deterministic
+   queries from the org profile (each focus area × geography scope {city, state,
+   New England, national} × population × this year + next).
+2. **Funder-wide site sweep** — fetches the website of *every* funder in the DB
+   (the 15 priority funders + 17 community partners already seeded), probing
+   common grant sub-paths (/grants, /apply, …) off each homepage.
+3. **Curated public portals** — Mass.gov, Boston.gov, Somerville, Barr
+   Foundation, The Boston Foundation, etc., swept every run.
+
+Exposed via the Discover page "🌐 Search Everywhere" button and the scheduled
+scan `--sweep` flag.
+
+**Assumptions:**
+- Breadth is capped (≤40 queries, polite per-host rate limiting + caching) so a
+  full sweep stays in the minutes range, suitable for a weekly scheduled run.
+- Sub-path probing only fires off bare homepages to stay courteous.
+- All fetches still honor robots.txt and the ToS-domain blocklist from D-016.
+
+---
+
 *This record is maintained by the implementation agent and should be reviewed by
 the project owner before Phase 6 integration testing.*

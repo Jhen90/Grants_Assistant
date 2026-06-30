@@ -46,6 +46,22 @@ _REGISTRY: dict[str, tuple[str, CustomParser]] = {
     "cummingsfoundation.org": ("Cummings Foundation", _cummings),
 }
 
+# Curated public grant portals swept on every full run ("search everywhere").
+# These are public funding-listing pages — fetched for the org's own research.
+PUBLIC_PORTALS: list[str] = [
+    "https://www.grants.gov/search-grants",
+    "https://www.mass.gov/topics/grants-funding",
+    "https://www.boston.gov/departments/grants",
+    "https://www.somervillema.gov/grants",
+    "https://www.cummingsfoundation.org/grants/",
+    "https://massculturalcouncil.org/programs-at-a-glance/",
+    "https://www.barrfoundation.org/grants",
+    "https://www.tbf.org/what-we-do/grants",  # The Boston Foundation
+]
+
+# Common sub-paths to try when sweeping a funder's homepage for a grants page.
+_GRANT_SUBPATHS = ("/grants", "/grant", "/apply", "/funding", "/grant-opportunities", "/rfp")
+
 
 class FunderSiteSource(GrantSource):
     name = "funder_site"
@@ -98,6 +114,40 @@ class FunderSiteSource(GrantSource):
             evidence=ev,
             raw_text=text[:4000],
         )
+
+    def sweep_urls(
+        self, urls: list[str], org_profile: dict, try_subpaths: bool = True
+    ) -> list[GrantCandidate]:
+        """
+        Fetch many funder/portal URLs and extract a candidate from each.
+        When `try_subpaths` is set, also probes common grant sub-paths
+        (/grants, /apply, …) off each homepage. De-dupes by resolved URL.
+        """
+        seen: set[str] = set()
+        candidates: list[GrantCandidate] = []
+
+        for base in urls:
+            for candidate_url in self._expand_url(base, try_subpaths):
+                if candidate_url in seen:
+                    continue
+                seen.add(candidate_url)
+                cand = self.fetch_url(candidate_url, org_profile)
+                if cand and cand.extracted.get("title"):
+                    candidates.append(cand)
+        log.info("funder_site sweep: %d candidates from %d base URLs.", len(candidates), len(urls))
+        return candidates
+
+    @staticmethod
+    def _expand_url(base: str, try_subpaths: bool) -> list[str]:
+        urls = [base]
+        if not try_subpaths:
+            return urls
+        parsed = urlparse(base)
+        # Only probe sub-paths off a bare homepage (no path), to stay polite.
+        if parsed.path in ("", "/"):
+            root = f"{parsed.scheme}://{parsed.netloc}"
+            urls.extend(root + sp for sp in _GRANT_SUBPATHS)
+        return urls
 
     @staticmethod
     def known_domains() -> list[str]:

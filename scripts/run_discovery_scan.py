@@ -51,9 +51,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--limit", type=int, default=15, help="Max results per source per query.",
     )
+    parser.add_argument(
+        "--sweep", action="store_true",
+        help="Run the full 'search everywhere' sweep (org-profile query expansion "
+             "+ all known funder sites + public portals) instead of fixed queries.",
+    )
     args = parser.parse_args(argv)
 
-    queries = args.queries or DEFAULT_QUERIES
     init_db()
 
     svc = DiscoveryService()
@@ -62,13 +66,19 @@ def main(argv: list[str] | None = None) -> int:
 
     total = 0
     try:
-        for query in queries:
-            log.info("Scanning: %s", query)
-            staged = svc.run_search(
-                db, query, sources=args.sources, limit_per_source=args.limit
-            )
-            total += len(staged)
-            log.info("  → staged %d new candidate(s).", len(staged))
+        if args.sweep:
+            log.info("Running full 'search everywhere' sweep.")
+            staged = svc.run_full_sweep(db, sources=args.sources, limit_per_source=args.limit)
+            total = len(staged)
+        else:
+            queries = args.queries or DEFAULT_QUERIES
+            for query in queries:
+                log.info("Scanning: %s", query)
+                staged = svc.run_search(
+                    db, query, sources=args.sources, limit_per_source=args.limit
+                )
+                total += len(staged)
+                log.info("  → staged %d new candidate(s).", len(staged))
     finally:
         try:
             next(db_gen)
