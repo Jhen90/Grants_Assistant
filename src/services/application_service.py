@@ -194,7 +194,14 @@ class ApplicationService:
                 blockers=blockers,
             )
 
-        # All checks pass — approve
+        # All checks pass — approve.
+        # The state machine requires DRAFT → IN_REVIEW → APPROVED. Reviews are
+        # complete at this point, so advance through IN_REVIEW if the application
+        # is still in DRAFT (it may not have been explicitly moved during review).
+        if application.status == ApplicationStatus.DRAFT:
+            application.status = advance_application_status(
+                application.status, ApplicationStatus.IN_REVIEW
+            )
         application.status = advance_application_status(
             application.status, ApplicationStatus.APPROVED
         )

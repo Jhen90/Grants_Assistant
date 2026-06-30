@@ -65,15 +65,17 @@ def build_org_context(org: object) -> dict[str, str]:
         p.get("name", "") for p in programs if p.get("name")
     ) if programs else ""
 
+    # Coerce every value to a string — nullable ORM columns read as None, which
+    # would otherwise render the literal text "None" in a template.
     return {
-        "org_name": getattr(org, "name", ""),
-        "mission": getattr(org, "mission", ""),
-        "values": getattr(org, "values_text", ""),
-        "city": getattr(org, "city", "") or elig.get("city", ""),
-        "state": getattr(org, "state", "") or elig.get("state", ""),
-        "target_population": elig.get("target_population", "youth ages 13–18"),
-        "org_type": elig.get("org_type", ""),
-        "partner_names": partner_names,
+        "org_name": getattr(org, "name", "") or "",
+        "mission": getattr(org, "mission", "") or "",
+        "values": getattr(org, "values_text", "") or "",
+        "city": getattr(org, "city", "") or elig.get("city", "") or "",
+        "state": getattr(org, "state", "") or elig.get("state", "") or "",
+        "target_population": elig.get("target_population", "youth ages 13–18") or "",
+        "org_type": elig.get("org_type", "") or "",
+        "partner_names": partner_names or "",
         "website": getattr(org, "website", "") or "",
     }
 

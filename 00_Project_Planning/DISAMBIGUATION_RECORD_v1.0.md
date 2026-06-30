@@ -340,6 +340,23 @@ Flagged for a dedicated follow-up pass to repair the v1.1.0 test suite.
 **Risk:** The original test suite does not currently pass end-to-end. The new
 discovery tests (`test_extractor.py`, `test_aggregator_csv.py`) do pass.
 
+**RESOLVED (follow-up, 2026-06-30):** The full suite now passes (127 tests). Fixes:
+- `test_scoring_engine.py` rewritten to use duck-typed `SimpleNamespace` stand-ins
+  and the engine's real criteria `config` schema, `is_hard_filter` flag, and
+  `criteria` JSON key.
+- `test_template_renderer.py` fixtures use the real `Organization(...)` constructor
+  instead of `__new__`.
+- **Genuine product bug fixed** in `build_org_context`: nullable columns (e.g.
+  `values_text`) returned `None`, which would render literal "None" in templates —
+  now coerced to "".
+- **Genuine product bug fixed** in `ApplicationService.approve_application`: it
+  attempted `DRAFT → APPROVED`, which the state machine forbids. The approval flow
+  was unrunnable end-to-end. Now advances `DRAFT → IN_REVIEW → APPROVED` when
+  reviews are complete. (Caught by both the unit test and the full-lifecycle
+  integration test.)
+- `test_report_generation.py` used near-identical grant titles from one funder,
+  which the dedup engine correctly flagged as duplicates — titles made distinct.
+
 ---
 
 ## D-019 — "Search Everywhere" Breadth Strategy (v1.2.0)

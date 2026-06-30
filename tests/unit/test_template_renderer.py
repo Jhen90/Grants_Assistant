@@ -15,15 +15,18 @@ from src.models.organization import Organization
 
 
 def _make_org(**kwargs) -> Organization:
-    org = Organization.__new__(Organization)
-    org.name = kwargs.get("name", "The Dojo")
-    org.mission = kwargs.get("mission", "Empowering youth through martial arts.")
-    org.city = kwargs.get("city", "Boston")
-    org.state = kwargs.get("state", "MA")
-    org.website = kwargs.get("website", None)
-    org.programs_json = kwargs.get("programs_json", "[]")
-    org.eligibility_json = kwargs.get("eligibility_json", "{}")
-    return org
+    # Real constructor (not __new__) so SQLAlchemy instrumentation is set up.
+    # values_text is intentionally left unset (reads as None) to exercise the
+    # None→"" coercion in build_org_context.
+    return Organization(
+        name=kwargs.get("name", "The Dojo"),
+        mission=kwargs.get("mission", "Empowering youth through martial arts."),
+        city=kwargs.get("city", "Boston"),
+        state=kwargs.get("state", "MA"),
+        website=kwargs.get("website", None),
+        programs_json=kwargs.get("programs_json", "[]"),
+        eligibility_json=kwargs.get("eligibility_json", "{}"),
+    )
 
 
 class TestRenderTemplate:

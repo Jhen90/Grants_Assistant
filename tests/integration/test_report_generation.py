@@ -43,7 +43,9 @@ def test_report_reflects_pipeline_data(
     grant_svc.create_grant(
         db,
         {
-            "title": "Report Test Grant A",
+            # Distinct titles — near-identical titles from the same funder are
+            # (correctly) flagged as duplicates by the dedup engine.
+            "title": "Youth Mentorship Program Fund",
             "funder_id": sample_funder.id,
             "funder_name": sample_funder.name,
             "deadline": date.today() + timedelta(days=50),
@@ -55,7 +57,7 @@ def test_report_reflects_pipeline_data(
     grant_svc.create_grant(
         db,
         {
-            "title": "Report Test Grant B",
+            "title": "Affordable Housing Capital Initiative",
             "funder_id": sample_funder.id,
             "funder_name": sample_funder.name,
             "source_url": "http://unique-url-for-b.org/rfp",
