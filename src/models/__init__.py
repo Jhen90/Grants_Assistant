@@ -23,6 +23,7 @@ from src.models.review import (
 from src.models.manifest import Manifest
 from src.models.template import Template
 from src.models.report import WeeklyReport
+from src.models.discovered_candidate import DiscoveredCandidate, CandidateStatus
 
 __all__ = [
     "Organization",
@@ -48,4 +49,6 @@ __all__ = [
     "Manifest",
     "Template",
     "WeeklyReport",
+    "DiscoveredCandidate",
+    "CandidateStatus",
 ]

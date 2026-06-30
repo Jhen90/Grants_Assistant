@@ -29,6 +29,8 @@ def upgrade() -> None:
         sa.Column("website", sa.String(1000), nullable=True),
         sa.Column("city", sa.String(255), nullable=True),
         sa.Column("state", sa.String(100), nullable=True),
+        sa.Column("ein", sa.String(20), nullable=True),
+        sa.Column("is_501c3", sa.Boolean, nullable=False, server_default="0"),
         sa.Column("is_deleted", sa.Boolean, nullable=False, server_default="0"),
         sa.Column("created_at", sa.DateTime, nullable=False, server_default=sa.func.now()),
         sa.Column("updated_at", sa.DateTime, nullable=False, server_default=sa.func.now()),

@@ -281,5 +281,66 @@ Fully overridable via the `EXPORT_DIR` environment variable.
 
 ---
 
+## D-016 — Grant Discovery Subsystem: Aggregator ToS Compliance (v1.2.0)
+
+**Phase:** v1.2.0 Discovery feature (new scope, post-v1.1.0)
+**Decision:** User requested "search then scrape" across sources and explicitly
+selected **Instrumentl** and **Candid** aggregators. Both prohibit automated
+scraping in their Terms of Service.
+
+**Resolution:** Built the *compliant* path instead of a scraper:
+- **Candid** → official API connector (`CandidApiSource`), key-gated and
+  **disabled by default** (mirrors the Ollama/Google Docs deferred-integration
+  pattern). Activates only when `candid_api_enabled=True` and a key is set.
+- **Instrumentl** → no scraping. `InstrumentlCsvImporter` parses the CSV/Excel
+  export that Instrumentl subscribers are permitted to download from their own
+  account. ToS-compliant.
+- `WebSearchSource` hard-blocks `instrumentl.com`, `candid.org`, and
+  `foundationcenter.org` domains from auto-fetch even if they appear in results.
+
+**Assumptions:**
+- The user (or The Dojo) does not currently hold a paid Candid API key — connector
+  ships off.
+- Fetching a *funder's own public grant page* for the org's own application
+  research is legitimate and not equivalent to aggregator scraping.
+
+## D-017 — No-AI Extraction via Deterministic Rules + Human Confirm (v1.2.0)
+
+**Decision:** "Scrape the data needed for the application" normally implies LLM
+field extraction, but production GMAS forbids paid AI APIs (core constraint).
+
+**Resolution:** `src/discovery/extractor.py` is fully deterministic (regex/HTML
+rules) — same input always yields the same output. Every extracted field carries
+a 0.0–1.0 confidence and the evidence snippet it came from. Nothing auto-creates
+a Grant: candidates are staged in `discovered_candidates` (status NEW) and only
+become Grants when a human confirms via the Discover → Review form. This preserves
+GMAS's existing human-in-the-loop philosophy. Local Ollama (deferred Phase 7)
+remains the future option for smarter extraction without a paid API.
+
+**Assumptions:**
+- Rules-based extraction is intentionally conservative; low-confidence fields are
+  flagged (🔴/🟡) for the human rather than trusted.
+- The polite fetcher honors robots.txt by default (`discovery_respect_robots=True`),
+  sets a descriptive User-Agent, rate-limits per host, and caches to disk.
+
+## D-018 — Pre-existing v1.1.0 Unit Tests Found Broken (Documented, Not Fixed Here)
+
+**Decision:** Running the full suite under the new conda env revealed that several
+original v1.1.0 unit tests (`test_scoring_engine.py`, `test_template_renderer.py`,
+parts of `test_application_service.py`) were authored without ever being executed
+(no env existed at build time) and assert against an imagined API — e.g. they
+expect a `criteria_results` JSON key while the engine emits `criteria`, and use
+`Model.__new__(Model)` which bypasses SQLAlchemy instrumentation.
+
+**Resolution:** Left these pre-existing test files **unchanged** to keep the
+v1.2.0 discovery commit cleanly scoped. The application code itself (scoring
+engine, template renderer) produces correct output; only the *tests* are stale.
+Flagged for a dedicated follow-up pass to repair the v1.1.0 test suite.
+
+**Risk:** The original test suite does not currently pass end-to-end. The new
+discovery tests (`test_extractor.py`, `test_aggregator_csv.py`) do pass.
+
+---
+
 *This record is maintained by the implementation agent and should be reviewed by
 the project owner before Phase 6 integration testing.*

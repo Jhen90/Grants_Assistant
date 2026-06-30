@@ -39,6 +39,32 @@ class Settings(BaseSettings):
     # Export
     export_dir: str = "data/exports"
 
+    # ── Grant Discovery / Scraping ───────────────────────────────────────────
+    # Polite-fetch identity and cache. The user-agent identifies GMAS to sites
+    # and points to a contact so site owners can reach you if needed.
+    discovery_user_agent: str = (
+        "GMAS-GrantBot/1.1 (+nonprofit grant research; contact: belleticreole90@gmail.com)"
+    )
+    discovery_cache_dir: str = "data/discovery_cache"
+    discovery_respect_robots: bool = True          # honor robots.txt (keep True)
+    discovery_fetch_timeout: int = 20              # seconds per HTTP request
+    discovery_min_request_interval: float = 2.0    # seconds between hits to same host
+
+    # Source toggles
+    source_grants_gov_enabled: bool = True
+    grants_gov_api_url: str = "https://api.grants.gov/v1/api/search2"
+    source_web_search_enabled: bool = True
+    source_funder_sites_enabled: bool = True
+
+    # Aggregators — ToS-compliant only.
+    # Candid (Foundation Directory) via official API key; disabled until a key is set.
+    candid_api_enabled: bool = False
+    candid_api_key: str = ""
+    candid_api_url: str = "https://api.candid.org/grants/v1"
+    # Instrumentl has no public API and its ToS forbids scraping — import via the
+    # CSV/Excel export their subscribers are permitted to download.
+    instrumentl_csv_import_enabled: bool = True
+
     # Phase 7 — Ollama (deferred)
     ollama_enabled: bool = False
     ollama_base_url: str = "http://localhost:11434"

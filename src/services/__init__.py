@@ -6,6 +6,7 @@
 # ============================================================
 
 from src.services.application_service import ApplicationService
+from src.services.discovery_service import DiscoveryService
 from src.services.funder_service import FunderService
 from src.services.grant_service import GrantService
 from src.services.manifest_service import ManifestService
@@ -15,6 +16,7 @@ from src.services.scoring_service import score_grant
 
 __all__ = [
     "ApplicationService",
+    "DiscoveryService",
     "FunderService",
     "GrantService",
     "ManifestService",
