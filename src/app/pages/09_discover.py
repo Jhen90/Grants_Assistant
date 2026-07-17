@@ -18,7 +18,7 @@ from src.services.discovery_service import DiscoveryService
 from src.utils.config import get_settings
 from src.utils.error_handler import DuplicateGrantError
 
-st.set_page_config(page_title="Discover — GMAS", page_icon="🔎", layout="wide")
+st.set_page_config(page_title="Discover — GrantNova", page_icon="🔎", layout="wide")
 
 svc = DiscoveryService()
 settings = get_settings()
@@ -231,7 +231,7 @@ def main() -> None:
         with url_tab:
             st.subheader("Scrape a Specific Grant URL")
             st.caption(
-                "Paste a funder's public grant/RFP page. GMAS fetches it (honoring "
+                "Paste a funder's public grant/RFP page. GrantNova fetches it (honoring "
                 "robots.txt) and extracts fields for your review."
             )
             url = st.text_input("Grant page URL", placeholder="https://funder.org/grants/rfp-2026")

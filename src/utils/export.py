@@ -15,7 +15,7 @@ from src.utils.logger import get_logger
 log = get_logger(__name__)
 
 
-def markdown_to_pdf(markdown_text: str, output_path: Path, title: str = "GMAS Export") -> Path:
+def markdown_to_pdf(markdown_text: str, output_path: Path, title: str = "GrantNova Export") -> Path:
     """
     Convert Markdown text to a PDF file at output_path.
     Requires: weasyprint (conda-forge) + markdown package.
@@ -35,7 +35,7 @@ def markdown_to_pdf(markdown_text: str, output_path: Path, title: str = "GMAS Ex
     return output_path
 
 
-def markdown_to_html(markdown_text: str, title: str = "GMAS Export") -> str:
+def markdown_to_html(markdown_text: str, title: str = "GrantNova Export") -> str:
     """Convert Markdown text to a complete, print-ready HTML document string."""
     try:
         import markdown as md_lib

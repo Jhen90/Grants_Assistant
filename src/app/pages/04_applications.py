@@ -20,7 +20,7 @@ from src.services.manifest_service import ManifestService
 from src.services.review_service import ReviewService
 from src.utils.error_handler import SubmissionBlockedError
 
-st.set_page_config(page_title="Applications — GMAS", page_icon="📝", layout="wide")
+st.set_page_config(page_title="Applications — GrantNova", page_icon="📝", layout="wide")
 
 app_svc = ApplicationService()
 review_svc = ReviewService()

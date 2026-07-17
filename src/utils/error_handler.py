@@ -3,12 +3,12 @@
 # Version: 1.1.0
 # Created: 2026-06-25
 # Modified: 2026-06-25
-# Description: Custom exception hierarchy for GMAS
+# Description: Custom exception hierarchy for GrantNova
 # ============================================================
 
 
 class GmasError(Exception):
-    """Base exception for all GMAS application errors."""
+    """Base exception for all GrantNova application errors."""
 
     def __init__(self, message: str, details: dict | None = None) -> None:
         super().__init__(message)

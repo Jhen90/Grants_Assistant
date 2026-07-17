@@ -3,7 +3,7 @@
 # Version: 1.1.0
 # Created: 2026-06-25
 # Modified: 2026-06-25
-# Description: GMAS Streamlit entry point — run with: streamlit run src/app/main.py
+# Description: GrantNova Streamlit entry point — run with: streamlit run src/app/main.py
 # ============================================================
 
 import streamlit as st
@@ -99,7 +99,7 @@ h3 { color: #2d3748; }
 
 def _configure_page() -> None:
     st.set_page_config(
-        page_title="GMAS — Grants Management Assistant",
+        page_title="GrantNova",
         page_icon="📋",
         layout="wide",
         initial_sidebar_state="expanded",
@@ -125,13 +125,13 @@ def main() -> None:
     settings = get_settings()
 
     with st.sidebar:
-        st.markdown("## 📋 GMAS")
+        st.markdown("## 📋 GrantNova")
         st.markdown(f"*v{settings.app_version}*")
         st.divider()
 
     st.title("Grants Management Assistant")
     st.markdown(
-        "Welcome to **GMAS**. Use the **pages** in the sidebar to navigate the system."
+        "Welcome to **GrantNova**. Use the **pages** in the sidebar to navigate the system."
     )
 
     col1, col2, col3, col4 = st.columns(4)
@@ -146,7 +146,7 @@ def main() -> None:
 
     st.divider()
     st.caption(
-        "GMAS v1.1.0 · Rules-based scoring · No AI API required · "
+        "GrantNova v1.1.0 · Rules-based scoring · No AI API required · "
         f"DB: `{settings.database_url}`"
     )
 

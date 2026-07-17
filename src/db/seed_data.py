@@ -449,7 +449,7 @@ def seed(profile_path: str = "data/org_profile/org_profile_seed_data.md") -> Non
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Seed the GMAS database.")
+    parser = argparse.ArgumentParser(description="Seed the GrantNova database.")
     parser.add_argument(
         "--profile",
         default="data/org_profile/org_profile_seed_data.md",

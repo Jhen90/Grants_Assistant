@@ -16,7 +16,7 @@ from src.engine.deadline_classifier import days_until_deadline
 from src.models.grant import DeadlineUrgency, Grant, GrantStatus
 from src.services.grant_service import GrantService
 
-st.set_page_config(page_title="Dashboard — GMAS", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Dashboard — GrantNova", page_icon="📊", layout="wide")
 
 grant_svc = GrantService()
 

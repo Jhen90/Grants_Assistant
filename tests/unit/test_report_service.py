@@ -39,7 +39,7 @@ class TestGenerateWeeklyReport:
         week_start = today - timedelta(days=today.weekday())
         report = svc.generate_weekly_report(db, week_start=week_start)
         assert len(report.content_markdown) > 0
-        assert "GMAS" in report.content_markdown or "Report" in report.content_markdown
+        assert "GrantNova" in report.content_markdown or "Report" in report.content_markdown
 
     def test_idempotent_generation(
         self, db: Session, svc: ReportService, sample_org: Organization

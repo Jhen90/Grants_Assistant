@@ -4,6 +4,7 @@
 # Created: 2026-06-25
 # Modified: 2026-06-25
 # Description: Application settings via pydantic-settings; loaded once at startup
+#   (GrantNova)
 # ============================================================
 
 from functools import lru_cache
@@ -21,13 +22,13 @@ class Settings(BaseSettings):
     )
 
     # Application
-    app_name: str = "GMAS"
-    app_version: str = "1.1.0"
+    app_name: str = "GrantNova"
+    app_version: str = "1.2.0"
     log_level: str = "INFO"
-    log_file: str = "logs/gmas.log"
+    log_file: str = "logs/grantnova.log"
 
     # Database
-    database_url: str = "sqlite:///data/gmas.db"
+    database_url: str = "sqlite:///data/grantnova.db"
 
     # Org profile
     org_profile_path: str = "data/org_profile/org_profile_seed_data.md"
@@ -40,10 +41,10 @@ class Settings(BaseSettings):
     export_dir: str = "data/exports"
 
     # ── Grant Discovery / Scraping ───────────────────────────────────────────
-    # Polite-fetch identity and cache. The user-agent identifies GMAS to sites
+    # Polite-fetch identity and cache. The user-agent identifies GrantNova to sites
     # and points to a contact so site owners can reach you if needed.
     discovery_user_agent: str = (
-        "GMAS-GrantBot/1.1 (+nonprofit grant research; contact: belleticreole90@gmail.com)"
+        "GrantNova-ScoutBot/1.2 (+nonprofit grant research; contact: belleticreole90@gmail.com)"
     )
     discovery_cache_dir: str = "data/discovery_cache"
     discovery_respect_robots: bool = True          # honor robots.txt (keep True)
@@ -80,7 +81,7 @@ class Settings(BaseSettings):
         url = self.database_url
         if url.startswith("sqlite:///"):
             return Path(url.replace("sqlite:///", ""))
-        return Path("data/gmas.db")
+        return Path("data/grantnova.db")
 
     @property
     def is_sqlite(self) -> bool:

@@ -16,7 +16,7 @@ from src.services.funder_service import FunderService
 from src.services.grant_service import GrantService
 from src.utils.error_handler import DuplicateGrantError
 
-st.set_page_config(page_title="Enter Grant — GMAS", page_icon="📥", layout="wide")
+st.set_page_config(page_title="Enter Grant — GrantNova", page_icon="📥", layout="wide")
 
 grant_svc = GrantService()
 funder_svc = FunderService()

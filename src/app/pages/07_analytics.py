@@ -17,7 +17,7 @@ from src.models.application import Application, ApplicationStatus
 from src.models.grant import Grant, GrantStatus
 from src.models.funder import Funder
 
-st.set_page_config(page_title="Analytics — GMAS", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Analytics — GrantNova", page_icon="📊", layout="wide")
 
 
 def main() -> None:

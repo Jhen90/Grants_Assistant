@@ -20,7 +20,7 @@ from src.services.funder_service import FunderService
 from src.services.grant_service import GrantService
 from src.utils.error_handler import InvalidStatusTransitionError
 
-st.set_page_config(page_title="Grants — GMAS", page_icon="📋", layout="wide")
+st.set_page_config(page_title="Grants — GrantNova", page_icon="📋", layout="wide")
 
 grant_svc = GrantService()
 funder_svc = FunderService()

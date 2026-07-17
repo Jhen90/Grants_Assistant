@@ -12,7 +12,7 @@ from src.db.database import get_db
 from src.models.funder import Funder, FunderType
 from src.services.funder_service import FunderService
 
-st.set_page_config(page_title="Funders — GMAS", page_icon="🏛️", layout="wide")
+st.set_page_config(page_title="Funders — GrantNova", page_icon="🏛️", layout="wide")
 
 funder_svc = FunderService()
 

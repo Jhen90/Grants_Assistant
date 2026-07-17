@@ -9,7 +9,7 @@
 #
 #   Nothing here auto-creates a Grant. Candidates are staged in
 #   discovered_candidates and only become Grants when a human imports them,
-#   preserving GMAS's human-in-the-loop guarantee.
+#   preserving GrantNova's human-in-the-loop guarantee.
 # ============================================================
 
 from __future__ import annotations

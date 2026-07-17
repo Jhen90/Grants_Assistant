@@ -13,7 +13,7 @@
 #     python -m scripts.run_discovery_scan --queries "youth STEM grant MA" "climate education grant"
 #
 #   Task Scheduler (weekly, Mondays 7am) — create with:
-#     schtasks /Create /SC WEEKLY /D MON /ST 07:00 /TN "GMAS Discovery Scan" ^
+#     schtasks /Create /SC WEEKLY /D MON /ST 07:00 /TN "GrantNova Discovery Scan" ^
 #       /TR "cmd /c cd /d C:\path\to\Grants_Assistant && conda activate gmas && python -m scripts.run_discovery_scan"
 # ============================================================
 
@@ -39,7 +39,7 @@ DEFAULT_QUERIES = [
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="GMAS scheduled discovery scan")
+    parser = argparse.ArgumentParser(description="GrantNova scheduled discovery scan")
     parser.add_argument(
         "--queries", nargs="*", default=None,
         help="Override the default saved searches.",

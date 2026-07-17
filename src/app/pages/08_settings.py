@@ -16,7 +16,7 @@ from src.models.selection_criteria import SelectionCriteria
 from src.services.grant_service import GrantService
 from src.utils.config import get_settings
 
-st.set_page_config(page_title="Settings — GMAS", page_icon="⚙️", layout="wide")
+st.set_page_config(page_title="Settings — GrantNova", page_icon="⚙️", layout="wide")
 
 settings = get_settings()
 grant_svc = GrantService()

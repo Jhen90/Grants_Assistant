@@ -15,7 +15,7 @@ from src.db.database import get_db
 from src.services.report_service import ReportService
 from src.utils.config import get_settings
 
-st.set_page_config(page_title="Reports — GMAS", page_icon="📈", layout="wide")
+st.set_page_config(page_title="Reports — GrantNova", page_icon="📈", layout="wide")
 
 report_svc = ReportService()
 settings = get_settings()

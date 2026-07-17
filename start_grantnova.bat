@@ -2,7 +2,7 @@
 setlocal
 
 echo ============================================================
-echo  GMAS v1.1.0 -- Grants Management Assistant
+echo  GrantNova v1.2.0 -- Grant Scout & Management
 echo ============================================================
 echo.
 
@@ -22,7 +22,7 @@ set PYTHONPATH=%CD%
 echo [1/2] Seeding database...
 python -m src.db.seed_data
 if errorlevel 1 (
-    echo ERROR: Database seed failed. Check logs\gmas.log for details.
+    echo ERROR: Database seed failed. Check logs\grantnova.log for details.
     pause
     exit /b 1
 )

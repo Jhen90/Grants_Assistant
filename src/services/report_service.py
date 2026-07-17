@@ -109,7 +109,7 @@ class ReportService:
 
         html_content = self._markdown_to_html(
             report.content_markdown,
-            title=f"GMAS Weekly Report — {report.week_start}",
+            title=f"GrantNova Weekly Report — {report.week_start}",
         )
         output_path.parent.mkdir(parents=True, exist_ok=True)
         HTML(string=html_content).write_pdf(str(output_path))
@@ -243,7 +243,7 @@ class ReportService:
     @staticmethod
     def _plain_text_fallback(snapshot: dict) -> str:
         lines = [
-            f"# GMAS Weekly Report",
+            f"# GrantNova Weekly Report",
             f"**Organization:** {snapshot['org_name']}",
             f"**Period:** {snapshot['week_start']} – {snapshot['week_end']}",
             "",
@@ -265,7 +265,7 @@ class ReportService:
         return "\n".join(lines)
 
     @staticmethod
-    def _markdown_to_html(markdown_text: str, title: str = "GMAS Report") -> str:
+    def _markdown_to_html(markdown_text: str, title: str = "GrantNova Report") -> str:
         """Wrap Markdown in a minimal HTML page for weasyprint rendering."""
         try:
             import markdown as md_lib

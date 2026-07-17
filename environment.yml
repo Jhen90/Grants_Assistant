@@ -3,7 +3,7 @@
 # Version: 1.1.0
 # Created: 2026-06-25
 # Modified: 2026-06-25
-# Description: Conda environment definition for GMAS
+# Description: Conda environment definition for GrantNova
 # Usage: conda env create -f environment.yml
 #        conda activate gmas
 # ============================================================

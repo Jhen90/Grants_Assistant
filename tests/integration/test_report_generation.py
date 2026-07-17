@@ -74,7 +74,7 @@ def test_report_reflects_pipeline_data(
 
     assert report.org_id == sample_org.id
     assert report.grants_evaluated + report.grants_recommended >= 2
-    assert "GMAS" in report.content_markdown or "Report" in report.content_markdown
+    assert "GrantNova" in report.content_markdown or "Report" in report.content_markdown
 
 
 def test_markdown_export_contains_org_name(
