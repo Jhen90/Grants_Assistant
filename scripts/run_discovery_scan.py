@@ -56,6 +56,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Run the full 'search everywhere' sweep (org-profile query expansion "
              "+ all known funder sites + public portals) instead of fixed queries.",
     )
+    parser.add_argument(
+        "--report", action="store_true",
+        help="After scanning, print the Grant Scout intelligence digest of candidates "
+             "awaiting review (read-only).",
+    )
     args = parser.parse_args(argv)
 
     init_db()
@@ -65,13 +70,13 @@ def main(argv: list[str] | None = None) -> int:
     db = next(db_gen)
 
     total = 0
+    queries = args.queries or DEFAULT_QUERIES
     try:
         if args.sweep:
             log.info("Running full 'search everywhere' sweep.")
             staged = svc.run_full_sweep(db, sources=args.sources, limit_per_source=args.limit)
             total = len(staged)
         else:
-            queries = args.queries or DEFAULT_QUERIES
             for query in queries:
                 log.info("Scanning: %s", query)
                 staged = svc.run_search(
@@ -79,16 +84,22 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 total += len(staged)
                 log.info("  → staged %d new candidate(s).", len(staged))
+
+        # REPORT: print the intelligence digest while the session is still open.
+        if args.report:
+            from src.services.scout_report_service import ScoutReportService
+
+            report = ScoutReportService().generate_report(db)
+            print("\n" + report.markdown)
     finally:
         try:
             next(db_gen)
         except StopIteration:
             pass
 
-    log.info("Discovery scan complete. %d new candidate(s) staged across %d queries.",
-             total, len(queries))
+    log.info("Discovery scan complete. %d new candidate(s) staged.", total)
     print(f"Discovery scan complete: {total} new candidate(s) staged. "
-          f"Review them in the Discover → Review Queue tab.")
+          f"Review them in the Scout → Review Queue tab.")
     return 0
 
 

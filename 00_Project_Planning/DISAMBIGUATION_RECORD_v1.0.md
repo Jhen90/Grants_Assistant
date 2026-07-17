@@ -422,6 +422,21 @@ lifeline (required-but-sponsorable) correctly yields ELIGIBLE.
 matching the discovery/Scout feature line already stamped in the `src/discovery/**`
 file headers. Low-risk, not covered by an AC; noted for traceability.
 
+## D-023 — Fixed latent NameError in run_discovery_scan.py (Scout REPORT, Phase 3)
+
+**Bug found:** While adding `--report`, discovered the scan's final log line referenced
+`len(queries)` but `queries` was only bound on the non-`--sweep` branch — so
+`python -m scripts.run_discovery_scan --sweep` would raise `NameError` at the end of a
+successful sweep.
+
+**Decision:** Hoisted `queries = args.queries or DEFAULT_QUERIES` above the branch so it
+is always defined, and simplified the completion log to not depend on it. Report
+generation was placed inside the `try` (before the session-closing `finally`) so the
+digest renders against the open DB session.
+
+**Rationale:** In-path bugfix that would otherwise break the scheduled `--sweep` run;
+low-risk and covered by the CLI smoke check for `--report`.
+
 ---
 
 *This record is maintained by the implementation agent and should be reviewed by
