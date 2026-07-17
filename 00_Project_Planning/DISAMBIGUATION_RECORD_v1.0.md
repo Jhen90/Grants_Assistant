@@ -437,6 +437,25 @@ digest renders against the open DB session.
 **Rationale:** In-path bugfix that would otherwise break the scheduled `--sweep` run;
 low-risk and covered by the CLI smoke check for `--report`.
 
+## D-024 — SDLC v1.2.0 bump scoped to PRD + HLD (Phase 4)
+
+**Decision:** WP-6b produced **PRD v1.2.0** (adds §2.13 Grant Scout: FR-SCOUT-1xx…4xx +
+NFR-SCOUT-001–007) and **HLD v1.2.0** (adds §14 Grant Scout Subsystem), and archived
+their v1.1.0 predecessors to `old-versions-archive/`. The **Detailed Design** and
+**Overview** were intentionally left at v1.1.0 this pass.
+
+**Rationale:** the Scout's detailed design (classes, data model, migration 004, service
+methods, data flow) is already fully and authoritatively specified in
+`05_Grant_Scout_Task_Implementation_Plan_v1.0.0.md`. Re-expressing it in DD/Overview
+now would duplicate content and risk drift. Bumping DD + Overview to v1.2.0 (pointing at
+the TIP) is a low-risk follow-up doc pass, deferred to keep this session scoped to the
+requirements + architecture level the acceptance criteria target.
+
+**Superseded PRD scratch note:** the uncommitted working-tree edits to PRD v1.1.0 (a
+paste of the Scout kickoff prompt + a weekly-report sketch) were discarded when building
+v1.2.0 — that content is preserved in git history, the AI session transcript, and is now
+fully realized in code + the TIP.
+
 ---
 
 *This record is maintained by the implementation agent and should be reviewed by
