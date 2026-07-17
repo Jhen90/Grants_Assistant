@@ -3,8 +3,9 @@
 # Version: 1.2.0
 # Created: 2026-06-30
 # Modified: 2026-06-30
-# Description: Discover — search/scrape grant opportunities, review extracted
-#   fields, and import (human-confirmed) into the grant pipeline.
+# Description: Grant Scout — hunt/gather grant opportunities, review the ranked
+#   evaluated queue (green = strong eligible match), read the weekly intelligence
+#   digest, and import (human-confirmed) into the grant pipeline.
 # ============================================================
 
 import json
@@ -13,15 +14,25 @@ from datetime import date
 import streamlit as st
 
 from src.db.database import get_db
-from src.models.discovered_candidate import CandidateStatus
+from src.models.discovered_candidate import CandidateStatus, EligibilityStatus
 from src.services.discovery_service import DiscoveryService
+from src.services.scout_report_service import ScoutReportService
 from src.utils.config import get_settings
 from src.utils.error_handler import DuplicateGrantError
 
-st.set_page_config(page_title="Discover — GrantNova", page_icon="🔎", layout="wide")
+st.set_page_config(page_title="Grant Scout — GrantNova", page_icon="🛰️", layout="wide")
 
 svc = DiscoveryService()
+report_svc = ScoutReportService()
 settings = get_settings()
+
+
+def _queue_label(c) -> str:
+    """One-line queue label: green flag for strong eligible matches, fit, urgency."""
+    flag = "🟢" if c.is_strong_match else ("🟡" if c.eligibility_status == EligibilityStatus.ELIGIBLE else "⚪")
+    fit = f"{c.fit_score:.1f}" if c.fit_score is not None else "—"
+    act = " ⏰" if c.act_now else ""
+    return f"{flag}{act}  {c.raw_title[:52]}  ·  fit {fit}  ·  {c.source}"
 
 
 def _confidence_flag(conf: float | None) -> str:
@@ -153,18 +164,19 @@ def _render_import_form(cand, db) -> None:
 
 
 def main() -> None:
-    st.title("🔎 Discover Grants")
+    st.title("🛰️ Grant Scout")
     st.caption(
-        "Search and scrape grant opportunities. Every result is staged for your "
-        "review — nothing becomes a tracked grant until you confirm it."
+        "Hunt, gather, evaluate, and report on grant opportunities. Every result is "
+        "scored and staged for your review — nothing becomes a tracked grant until you "
+        "confirm it. 🟢 = strong eligible match, ⏰ = act now (closing soon)."
     )
 
     db_gen = get_db()
     db = next(db_gen)
 
     try:
-        search_tab, review_tab, url_tab, csv_tab = st.tabs(
-            ["🔍 Search", "📋 Review Queue", "🔗 Scrape URL", "📄 Instrumentl CSV"]
+        search_tab, review_tab, report_tab, url_tab, csv_tab = st.tabs(
+            ["🔍 Search", "📋 Review Queue", "📊 Report", "🔗 Scrape URL", "📄 Instrumentl CSV"]
         )
 
         # ── Search tab ───────────────────────────────────────────────────────
@@ -205,27 +217,59 @@ def main() -> None:
 
         # ── Review queue tab ─────────────────────────────────────────────────
         with review_tab:
-            st.subheader("Candidates Awaiting Review")
-            status_filter = st.radio(
-                "Show",
-                [CandidateStatus.NEW, CandidateStatus.DUPLICATE, CandidateStatus.IMPORTED,
-                 CandidateStatus.DISMISSED],
-                format_func=lambda s: s.value.title(),
-                horizontal=True,
-            )
+            st.subheader("Ranked Review Queue")
+            st.caption("Best-first: strong eligible matches (🟢) rise to the top.")
+            top_row = st.columns([2, 1])
+            with top_row[0]:
+                status_filter = st.radio(
+                    "Show",
+                    [CandidateStatus.NEW, CandidateStatus.DUPLICATE, CandidateStatus.IMPORTED,
+                     CandidateStatus.DISMISSED],
+                    format_func=lambda s: s.value.title(),
+                    horizontal=True,
+                )
+            with top_row[1]:
+                hide_ineligible = st.toggle("Hide ineligible", value=False)
+
             candidates = svc.list_candidates(db, status=status_filter)
+            if hide_ineligible:
+                candidates = [
+                    c for c in candidates if c.eligibility_status != EligibilityStatus.INELIGIBLE
+                ]
             if not candidates:
                 st.info("No candidates with this status.")
             else:
-                labels = {
-                    f"{c.raw_title[:60]}  ·  {c.source}": c.id for c in candidates
-                }
+                strong_n = sum(1 for c in candidates if c.is_strong_match)
+                act_n = sum(1 for c in candidates if c.act_now)
+                st.write(f"**{len(candidates)}** shown · 🟢 **{strong_n}** strong · ⏰ **{act_n}** act now")
+                labels = {_queue_label(c): c.id for c in candidates}
                 selected_label = st.selectbox("Select a candidate", list(labels.keys()))
                 selected_id = labels[selected_label]
                 cand = svc.get_candidate(db, selected_id)
                 if cand:
+                    if cand.is_strong_match:
+                        st.success(f"🟢 Strong eligible match · fit {cand.fit_score:.1f}/10 · {cand.why_fits}")
+                    elif cand.eligibility_status == EligibilityStatus.INELIGIBLE:
+                        st.caption(f"Not currently eligible · fit {cand.fit_score:.1f}/10")
                     st.divider()
                     _render_import_form(cand, db)
+
+        # ── Report tab ───────────────────────────────────────────────────────
+        with report_tab:
+            st.subheader("Grant Scout Intelligence Report")
+            st.caption("A weekly digest of candidates awaiting review — Act Now first.")
+            if st.button("📊 Generate digest", type="primary"):
+                report = report_svc.generate_report(db)
+                st.write(
+                    f"**{report.total}** new · 🟢 **{report.strong}** strong · ⏰ **{report.act_now}** act now"
+                )
+                st.code(report.markdown, language="markdown")
+                st.download_button(
+                    "⬇️ Download digest (Markdown)",
+                    data=report.markdown,
+                    file_name=f"scout_digest_{date.today().isoformat()}.md",
+                    mime="text/markdown",
+                )
 
         # ── Scrape URL tab ───────────────────────────────────────────────────
         with url_tab:
