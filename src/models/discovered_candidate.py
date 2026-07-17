@@ -14,7 +14,7 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, String, Text, func
+from sqlalchemy import Boolean, DateTime, Enum, Float, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.db.database import Base
@@ -25,6 +25,12 @@ class CandidateStatus(str, enum.Enum):
     IMPORTED = "IMPORTED"    # converted into a Grant record
     DISMISSED = "DISMISSED"  # human rejected it
     DUPLICATE = "DUPLICATE"  # matched an existing grant during dedup
+
+
+class EligibilityStatus(str, enum.Enum):
+    ELIGIBLE = "ELIGIBLE"      # org can apply (incl. via an allowed fiscal sponsor)
+    INELIGIBLE = "INELIGIBLE"  # a hard filter blocks the org
+    UNKNOWN = "UNKNOWN"        # not enough info / no active criteria to decide
 
 
 class DiscoveredCandidate(Base):
@@ -50,6 +56,16 @@ class DiscoveredCandidate(Base):
     # If imported, the Grant it became; if duplicate, the existing Grant it matched.
     linked_grant_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     dedup_note: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
+    # ── EVALUATE phase (pre-review scoring, migration 004) ─────────────────────
+    fit_score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    eligibility_status: Mapped[EligibilityStatus | None] = mapped_column(
+        Enum(EligibilityStatus, name="eligibility_status_enum"), nullable=True
+    )
+    is_strong_match: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    deadline_urgency: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    act_now: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    why_fits: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     search_query: Mapped[str | None] = mapped_column(String(500), nullable=True)
     discovered_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=func.now())

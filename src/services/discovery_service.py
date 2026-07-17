@@ -21,6 +21,7 @@ from sqlalchemy.orm import Session
 
 from src.db.org_profile_loader import load as load_org_profile
 from src.discovery.base import GrantCandidate
+from src.discovery.evaluator import evaluate_candidate
 from src.discovery.fetcher import PoliteFetcher
 from src.discovery.query_expander import expand_queries
 from src.discovery.sources import (
@@ -35,6 +36,8 @@ from src.engine.deduplication import find_duplicates
 from src.models.discovered_candidate import CandidateStatus, DiscoveredCandidate
 from src.models.funder import Funder
 from src.models.grant import Grant
+from src.models.organization import Organization
+from src.models.selection_criteria import SelectionCriteria
 from src.services.grant_service import GrantService
 from src.utils.config import get_settings
 from src.utils.error_handler import DuplicateGrantError
@@ -158,7 +161,36 @@ class DiscoveryService:
         q = db.query(DiscoveredCandidate).filter(DiscoveredCandidate.is_deleted.is_(False))
         if status is not None:
             q = q.filter(DiscoveredCandidate.status == status)
-        return q.order_by(DiscoveredCandidate.discovered_at.desc()).all()
+        # Newest first as a stable baseline; the review queue is then ranked best-first.
+        rows = q.order_by(DiscoveredCandidate.discovered_at.desc()).all()
+        if status == CandidateStatus.NEW:
+            rows.sort(key=self._rank_key)
+        return rows
+
+    def reevaluate_candidates(
+        self,
+        db: Session,
+        statuses: tuple[CandidateStatus, ...] = (CandidateStatus.NEW, CandidateStatus.DUPLICATE),
+    ) -> int:
+        """
+        Re-score all candidates in the given statuses against the CURRENT active
+        criteria (e.g. after the criteria set changes). Idempotent — updates rows
+        in place, never creates or duplicates them. Returns the number updated.
+        """
+        criteria_list, org = self._load_scoring_context(db)
+        rows = (
+            db.query(DiscoveredCandidate)
+            .filter(
+                DiscoveredCandidate.is_deleted.is_(False),
+                DiscoveredCandidate.status.in_(statuses),
+            )
+            .all()
+        )
+        for row in rows:
+            self._apply_evaluation(row, self._extracted_of(row), criteria_list, org)
+        db.commit()
+        log.info("Re-evaluated %d candidate(s) against current criteria.", len(rows))
+        return len(rows)
 
     def get_candidate(self, db: Session, candidate_id: str) -> DiscoveredCandidate | None:
         return db.query(DiscoveredCandidate).filter_by(id=candidate_id, is_deleted=False).first()
@@ -218,6 +250,60 @@ class DiscoveryService:
             active = [c for c in active if c.name in sources]
         return active
 
+    # ── evaluation helpers (EVALUATE phase) ────────────────────────────────────
+
+    @staticmethod
+    def _load_scoring_context(db: Session) -> tuple[list[dict], Organization | None]:
+        """Active criteria list + primary org — the inputs the evaluator needs."""
+        criteria = (
+            db.query(SelectionCriteria)
+            .filter_by(is_active=True)
+            .order_by(SelectionCriteria.created_at)
+            .first()
+        )
+        org = (
+            db.query(Organization)
+            .filter_by(is_deleted=False)
+            .order_by(Organization.created_at)
+            .first()
+        )
+        try:
+            criteria_list = json.loads(criteria.criteria_json or "[]") if criteria else []
+        except json.JSONDecodeError:
+            criteria_list = []
+        return criteria_list, org
+
+    @staticmethod
+    def _apply_evaluation(
+        row: DiscoveredCandidate, extracted: dict, criteria_list: list[dict], org
+    ) -> None:
+        ev = evaluate_candidate(extracted, criteria_list, org)
+        row.fit_score = ev.fit_score
+        row.eligibility_status = ev.eligibility_status
+        row.is_strong_match = ev.is_strong_match
+        row.deadline_urgency = ev.deadline_urgency
+        row.act_now = ev.act_now
+        row.why_fits = ev.why_fits
+
+    @staticmethod
+    def _extracted_of(row: DiscoveredCandidate) -> dict:
+        try:
+            payload = json.loads(row.extracted_json or "{}")
+        except json.JSONDecodeError:
+            return {}
+        return dict(payload.get("extracted", {}))
+
+    @staticmethod
+    def _rank_key(row: DiscoveredCandidate) -> tuple:
+        """Best-first: strong matches, then ELIGIBLE, then higher fit (FR-SCOUT-303/304)."""
+        elig_order = {"ELIGIBLE": 0, "UNKNOWN": 1, "INELIGIBLE": 2}
+        elig = row.eligibility_status.value if row.eligibility_status else "UNKNOWN"
+        return (
+            0 if row.is_strong_match else 1,
+            elig_order.get(elig, 1),
+            -(row.fit_score or 0.0),
+        )
+
     def _stage_candidates(
         self, db: Session, raw: list[GrantCandidate], search_query: str
     ) -> list[DiscoveredCandidate]:
@@ -228,6 +314,7 @@ class DiscoveryService:
             .filter(DiscoveredCandidate.source_url.isnot(None))
             .all()
         }
+        criteria_list, org = self._load_scoring_context(db)
 
         staged: list[DiscoveredCandidate] = []
         for gc in raw:
@@ -245,6 +332,9 @@ class DiscoveryService:
                 search_query=search_query[:500],
                 status=CandidateStatus.NEW,
             )
+
+            # EVALUATE: score + eligibility + urgency BEFORE human review (FR-SCOUT-3xx).
+            self._apply_evaluation(row, gc.extracted, criteria_list, org)
 
             # Flag (don't drop) likely duplicates of existing grants for human review.
             matches = find_duplicates(

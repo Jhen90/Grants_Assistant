@@ -385,5 +385,44 @@ scan `--sweep` flag.
 
 ---
 
+## D-020 — DB rename via Alembic rebuild, not in-place stamp (GrantNova, Phase 1)
+
+**Decision:** The owner renamed `data/gmas.db` → `data/grantnova.db`. The live DB was
+built by `create_all()` (no `alembic_version`, missing `discovered_candidates`), so it
+was not safely stampable.
+
+**Resolution:** Rather than `alembic stamp` the legacy file in place (risky given the
+Jun-25 `create_all` schema may not byte-match the migration DDL), rebuilt a canonical
+DB from `alembic upgrade head` (001→004) and copied the real data across with a
+drift-safe, idempotent script (`scripts/migrate_gmas_to_grantnova.py`, shared-column
+intersection + `INSERT OR IGNORE`). Backup taken first
+(`data/backups/gmas.db.pre-grantnova-20260716.bak`); old DB retired after row-count
+parity confirmed. Alembic is now authoritative for the real DB.
+
+**Alternative not chosen:** in-place `stamp 002 → upgrade` (rejected: drift risk).
+
+## D-021 — Candidate eligibility_status derivation (Scout EVALUATE, Phase 3)
+
+**Spec gap:** FR-SCOUT-302 requires an ELIGIBLE/INELIGIBLE/UNKNOWN status, but the
+scoring engine only exposes a 0.0/0.5/1.0 eligibility criterion + a global
+`hard_filter_failed`.
+
+**Decision:** Mapped as: `hard_filter_failed` → INELIGIBLE; eligibility criterion
+raw 1.0 → ELIGIBLE; raw 0.5 (fiscal sponsorship allowed but no sponsor assigned yet)
+→ UNKNOWN; no eligibility criterion present → ELIGIBLE (nothing disqualifies); no active
+criteria/org at all → UNKNOWN with fit 0.0.
+
+**Rationale:** Preserves the human-in-the-loop stance — 0.5 is surfaced as "needs a
+sponsor decision" (UNKNOWN) rather than a false ELIGIBLE, and the fiscal-sponsorship
+lifeline (required-but-sponsorable) correctly yields ELIGIBLE.
+
+## D-022 — app_version bumped to 1.2.0 (Phase 1)
+
+**Decision:** `config.py` `app_version` advanced `1.1.0` → `1.2.0` during the rename,
+matching the discovery/Scout feature line already stamped in the `src/discovery/**`
+file headers. Low-risk, not covered by an AC; noted for traceability.
+
+---
+
 *This record is maintained by the implementation agent and should be reviewed by
 the project owner before Phase 6 integration testing.*
