@@ -440,8 +440,19 @@ Phase 4 (surface + finalize):WP-6a UI  ║  WP-6b Docs-finalize ──► [GATE:
 - **Every gate** = the orchestrator personally runs the listed VERIFY commands. A red
   VERIFY sends the WP back to its agent with the failing output attached — never a
   patch-over.
-- **Commits** happen only at phase boundaries, only after a full-suite green, and only
-  with your go-ahead (per standing rule: no commits unless you ask).
+- **Commit cadence: per Work Package, not per phase.** After each WP's ACs pass and the
+  full suite is green, commit that WP as a small, self-contained, reversible unit. With
+  longer autonomous cycles this keeps history bisectable and lets a bad decision be
+  rolled back incrementally rather than losing a whole phase. (Owner working agreement,
+  2026-07-16.)
+- **Autonomous decisions get logged.** Any judgment call made without explicit owner
+  input — by the orchestrator or a background agent — is recorded in
+  `DISAMBIGUATION_RECORD_v1.0.md` as a `D-0xx` entry (decision, alternative, rationale)
+  so unattended work stays auditable.
+- **Background agents** are to run more unattended over time, but only inside a strict
+  per-project sandbox (no access outside this repo). Until that sandbox + permission
+  allowlist is configured and confirmed, detached agents cannot write/execute here, so
+  the orchestrator executes WPs directly.
 
 ## 7. Scout Intelligence Report format (for WP-5 template)
 
