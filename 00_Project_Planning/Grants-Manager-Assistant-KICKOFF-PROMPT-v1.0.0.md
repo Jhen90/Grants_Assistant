@@ -79,4 +79,43 @@ Update your plan and wait for me to review it.
 ####################################################################
 
 The fiscal sponsor will be various community organizations, some of which are 501(c)3 orgs.  We can use the organization named "Teen Empowerment" as the main fiscal sponsor for "The Dojo at SomerNova".  Different community partner organizations will serve as fiscal sponsors on the program-level basis for "The Dojo at SomerNova".   We can make this configurable on a per-grant basis.  
+########################################################################################
+
+PROMPT TO ADD GRANT FINDER MODULE(S): 
+
+You didn't understand (or I didn't articulate) a crucial set of capabilities.  
+
+We want GMAS to also be an Expert Grant Opportunity Finder (hunter-gatherer) and Evaluation Assistant to help identify the best-targeted grant opportunities, "best" means largest money for least effort, with 
+
+YOU SAID: 
+"""
+GMAS doesn't scrape or search for grants automatically — it's a management system, not a discovery engine. The workflow is:
+
+Find grants externally — use these sources to discover opportunities:
+
+Candid/Foundation Directory
+Grants.gov (federal)
+Massachusetts Cultural Council (state/local)
+Funder websites directly (your 15 priority funders are already seeded)
+Google: "youth development" "Boston" "grant" "2026" "RFP"
+Enter the grant in GMAS — click Enter Grant in the sidebar, fill in the title, funder, deadline, amount, focus areas, and paste the URL. Hit Save Grant.
+
+GMAS automatically:
+
+Checks for duplicates
+Scores it 0–10 against your org profile
+Classifies the deadline urgency
+Advances it to EVALUATED or RECOMMENDED
+Review on the Dashboard — urgent deadlines and top-recommended grants appear immediately.
+
+The URL field is the key — paste the RFP link so you always have a direct reference back to the source.
+"""
+
+
+The "Grant Discovery" module is missing.  Flesh out the functinoality and skills of an expert grants finder.  
+
+Grants Discovery Skill is missing
+
+Skill / Expertise Components: 
+    Hunter-Gatherer, Evaluator, Ranker, Trade-off Analyzer, Initial Decider. 
 

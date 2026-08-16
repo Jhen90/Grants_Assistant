@@ -33,6 +33,7 @@ google_credentials.json
 data/google_credentials.json
 
 # Database
+data/grantnova.db
 data/gmas.db
 data/backups/
 *.db-journal

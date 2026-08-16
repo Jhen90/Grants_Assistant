@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrantNova — Final Project Completion Plan</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 24px;
+      background: #f6f8fb;
+      color: #1f2937;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: white;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    h1, h2, h3 {
+      color: #0f172a;
+    }
+    h1 { margin-bottom: 8px; }
+    .meta {
+      color: #475569;
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+    .callout {
+      background: #eff6ff;
+      border-left: 4px solid #2563eb;
+      padding: 14px 16px;
+      margin: 16px 0 24px;
+      border-radius: 6px;
+    }
+    ol { padding-left: 22px; }
+    li { margin-bottom: 10px; }
+    .phase {
+      margin-top: 26px;
+      padding-top: 6px;
+      border-top: 1px solid #e2e8f0;
+    }
+    .done {
+      color: #166534;
+      font-weight: 600;
+    }
+    .todo {
+      color: #92400e;
+      font-weight: 600;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>GrantNova — Final Project Completion Plan</h1>
+    <div class="meta">Created: 2026-07-17 | Workspace: Grants_Assistant | Purpose: finish the remaining work and ship a complete, tested, documented handoff-ready version.</div>
+
+    <div class="callout">
+      <strong>Working rule:</strong> do not treat any item as complete until it has been verified by an actual run, test, or user-facing check. This plan assumes the current codebase is close to a usable release, but still needs finishing work around validation, documentation, polish, and release readiness.
+    </div>
+
+    <h2>Overall objective</h2>
+    <p>The project should be completed when the application is fully functional end to end, the core workflows are verified, the docs accurately describe what works, the repository is in a clean release state, and the system is ready for a real user or handoff.</p>
+
+    <div class="phase">
+      <h2>Phase 1 — Lock in the current baseline</h2>
+      <ol>
+        <li><span class="todo">Verify the current branch and repo state.</span> Confirm the active branch, review uncommitted changes, and ensure only intentional work is pending.</li>
+        <li><span class="todo">Run the full test suite.</span> Execute the existing automated tests and capture any failures before changing anything else.</li>
+        <li><span class="todo">Smoke-test the main application paths.</span> Launch the app and verify the core pages load properly: dashboard, grants, organization profile, selection criteria, and discovery/scout workflow.</li>
+        <li><span class="todo">Create a short issue list from real observations.</span> Record any broken flows, confusing UI behavior, missing validation, or unclear error handling so the plan can be executed in a controlled way.</li>
+      </ol>
+    </div>
+
+    <div class="phase">
+      <h2>Phase 2 — Finish all core user workflows</h2>
+      <ol>
+        <li><span class="todo">Complete the grant lifecycle flow.</span> Make sure a grant can be created, reviewed, scored, updated, and moved through its intended statuses without manual workarounds.</li>
+        <li><span class="todo">Verify the discovery and scout workflow end to end.</span> Confirm a search can produce candidates, the queue is ranked sensibly, the eligibility logic behaves as intended, and the report output is useful.</li>
+        <li><span class="todo">Test the import flow from discovery into the grant repository.</span> Confirm imported grants arrive with the expected metadata, score, and status values.</li>
+        <li><span class="todo">Validate the report and export experience.</span> Check that the generated digest/report is readable, that important warnings are surfaced correctly, and that export/download behavior works.</li>
+        <li><span class="todo">Check the data entry and validation experience.</span> Ensure forms fail gracefully, required fields are clearly enforced, and bad input is handled without confusing errors.</li>
+      </ol>
+    </div>
+
+    <div class="phase">
+      <h2>Phase 3 — Close the remaining quality and reliability gaps</h2>
+      <ol>
+        <li><span class="todo">Add or repair missing automated tests.</span> Focus on workflows that are user-critical but currently lightly covered: scoring, eligibility filtering, import behavior, report generation, and edge cases around empty data.</li>
+        <li><span class="todo">Improve error handling and user feedback.</span> Make sure failures show clear messages and suggest the next action rather than silently failing.</li>
+        <li><span class="todo">Review performance and responsiveness.</span> Check the app under realistic data volume and ensure discovery, scoring, and report generation do not become impractically slow.</li>
+        <li><span class="todo">Clean up edge-case behavior.</span> Handle empty queues, missing fields, invalid URLs, duplicate records, and incomplete profiles without crashing or breaking the experience.</li>
+        <li><span class="todo">Standardize state handling.</span> Ensure statuses, flags, and workflow transitions are consistent across the UI, services, and database.</li>
+      </ol>
+    </div>
+
+    <div class="phase">
+      <h2>Phase 4 — Finish the documentation and make it truthful</h2>
+      <ol>
+        <li><span class="todo">Update the project overview and planning docs.</span> Ensure the docs reflect what actually works now, not what was planned earlier.</li>
+        <li><span class="todo">Synchronize technical documentation with the implementation.</span> Review architecture docs, implementation notes, and module descriptions so they match the shipped code.</li>
+        <li><span class="todo">Write a user-facing guide.</span> Cover how to create a grant record, run discovery, review candidates, import results, and generate reports.</li>
+        <li><span class="todo">Write a short admin/operations guide.</span> Include setup steps, environment expectations, database notes, backup guidance, and how to troubleshoot common problems.</li>
+        <li><span class="todo">Archive or clearly mark outdated artifacts.</span> Remove confusion caused by old plan versions, stale assumptions, or superseded notes.</li>
+      </ol>
+    </div>
+
+    <div class="phase">
+      <h2>Phase 5 — Prepare the release and delivery package</h2>
+      <ol>
+        <li><span class="todo">Verify the installation path.</span> Ensure the project can be set up from a fresh environment without hidden manual steps.</li>
+        <li><span class="todo">Confirm dependency and environment files are current.</span> Review the requirements, environment file, and startup scripts so the project launches consistently.</li>
+        <li><span class="todo">Verify the database setup and migration path.</span> Make sure initialization, seed data, and migration behavior work from scratch.</li>
+        <li><span class="todo">Create a release checklist.</span> Include build, test, run, backup, and handoff steps so the final deployment is repeatable.</li>
+        <li><span class="todo">Prepare a final acceptance review.</span> Compare the system against the original product goals and confirm the major user stories are satisfied.</li>
+      </ol>
+    </div>
+
+    <div class="phase">
+      <h2>Phase 6 — Make the handoff clean and complete</h2>
+      <ol>
+        <li><span class="todo">Review and clean the repository.</span> Remove temporary files, stale debug artifacts, and incomplete experiments that should not ship.</li>
+        <li><span class="todo">Commit the work in logical chunks.</span> Group changes by theme such as workflow fixes, test coverage, documentation, and release prep.</li>
+        <li><span class="todo">Merge or prepare the release branch.</span> Ensure the final branch is ready for merge into the main line with clear notes and no half-finished work.</li>
+        <li><span class="todo">Document the final state clearly.</span> Provide a short handoff summary that explains what is done, what remains optional, and how to run the system.</li>
+        <li><span class="todo">Decide the next operational step.</span> Either ship the project for local use, prepare for deployment, or explicitly define the remaining scope if a hard deadline is approaching.</li>
+      </ol>
+    </div>
+
+    <div class="phase">
+      <h2>Suggested execution order</h2>
+      <ol>
+        <li>Stabilize the current baseline and fix any failing tests.</li>
+        <li>Verify the main workflows by running them manually.</li>
+        <li>Close the highest-impact reliability gaps.</li>
+        <li>Update documentation to match reality.</li>
+        <li>Prepare the final release package and handoff materials.</li>
+      </ol>
+    </div>
+
+    <div class="phase">
+      <h2>Definition of done</h2>
+      <p>The project is finished when all of the following are true:</p>
+      <ul>
+        <li>The major workflows can be completed without manual intervention.</li>
+        <li>The full test suite passes or only known, documented exceptions remain.</li>
+        <li>The docs accurately describe the current state of the product.</li>
+        <li>The repository is organized and ready for merge or handoff.</li>
+        <li>A user can set up and run the application with clear instructions.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
