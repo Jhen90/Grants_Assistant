@@ -1,0 +1,134 @@
+# Community Room Match Initiative (Concept)
+
+## Overview
+
+The Community Room Match Initiative is a housing stabilization concept designed to connect people with available spare rooms to individuals experiencing housing insecurity through trusted nonprofit and public organizations—not through direct person-to-person listings.
+
+Unlike Craigslist or other roommate platforms, this model relies on established housing organizations to screen participants, verify eligibility, coordinate financial assistance, and provide ongoing support. The goal is to create safe, temporary housing opportunities while helping prevent homelessness and reducing pressure on emergency shelters.
+
+## Problem
+
+Somerville faces two related challenges:
+
+- Many residents are experiencing homelessness or are at immediate risk of losing housing.
+- Many homeowners and renters have spare bedrooms that remain unused but are hesitant to rent them because of safety concerns, legal questions, or uncertainty about available financial assistance.
+
+At the same time, Massachusetts offers programs that can help stabilize housing costs, but many residents are unaware of them or do not know how to access them.
+
+## Proposed Solution
+
+Instead of creating another public roommate marketplace, this initiative would build a referral network managed by trusted housing organizations.
+
+Organizations would:
+
+- Identify individuals in need of temporary housing.
+- Screen and assess participants.
+- Work with homeowners or tenants who have available rooms.
+- Help determine eligibility for housing assistance programs.
+- Coordinate financial assistance when available.
+- Provide case management and support throughout the placement.
+
+This creates a structured, accountable process rather than an informal arrangement between strangers.
+
+## Potential Partner Organizations
+
+Examples of organizations that could participate include:
+
+- Somerville Homeless Coalition
+- CASPAR (CAS)
+- City of Somerville Office of Housing Stability
+- Somerville Community Corporation (SCC)
+- Other approved nonprofit housing providers
+
+The organizations—not the platform—would manage placements and participant eligibility.
+
+## Housing Model
+
+The platform would focus on temporary housing placements rather than permanent roommate arrangements.
+
+Examples include:
+
+- Short-term housing while someone searches for permanent housing.
+- Temporary housing following eviction prevention efforts.
+- Bridge housing during employment or income stabilization.
+- Transitional housing after leaving shelters or other emergency situations.
+
+Each placement would have:
+
+- A defined start date.
+- A defined expected end date.
+- Clear expectations for both parties.
+- Written agreements managed through participating organizations.
+
+## Financial Assistance
+
+Participating organizations could help determine whether available assistance programs may apply, including:
+
+- RAFT (Residential Assistance for Families in Transition)
+- Section 8 or other rental assistance programs, where applicable
+- State or municipal housing stabilization funds
+- Emergency assistance grants
+- Other nonprofit funding sources
+
+The goal is to reduce financial barriers for both hosts and participants while ensuring placements remain temporary and sustainable.
+
+## Why This Is Different
+
+This is **not** another roommate marketplace.
+
+Traditional roommate websites connect strangers directly.
+
+This model connects people through trusted housing organizations that already have expertise in:
+
+- Housing stabilization
+- Case management
+- Eligibility verification
+- Conflict resolution
+- Resource coordination
+- Ongoing support
+
+The organizations remain involved throughout the process instead of simply introducing two individuals.
+
+## Potential Benefits
+
+For individuals experiencing homelessness:
+
+- Faster access to temporary housing.
+- More stable living environments.
+- Better connection to housing services.
+- Reduced reliance on shelters.
+
+For homeowners or tenants with spare rooms:
+
+- Support navigating housing assistance programs.
+- Organizational oversight throughout the placement.
+- Additional financial stability through available assistance.
+- Reduced uncertainty compared to informal rentals.
+
+For the community:
+
+- Better use of existing housing capacity.
+- Lower pressure on emergency shelters.
+- Improved housing stability.
+- Stronger collaboration between nonprofit organizations and local government.
+
+## Future Platform Features
+
+Potential features could include:
+
+- Organization portal for referrals.
+- Room inventory management.
+- Eligibility tracking.
+- Secure document management.
+- Assistance program matching.
+- Case management dashboard.
+- Placement timelines.
+- Reporting and outcome tracking.
+- Resource directory.
+- Waitlist management.
+
+## Guiding Principle
+
+The platform exists to support housing organizations—not replace them.
+
+Every housing placement is initiated, reviewed, and supported by trusted nonprofit or public agencies, ensuring that temporary housing is safe, structured, and connected to longer-term housing solutions.

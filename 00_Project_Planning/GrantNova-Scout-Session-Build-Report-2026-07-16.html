@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GrantNova · Grant Scout — Session Build Report (2026-07-16)</title>
+</head>
+<body>
+<style>
+  :root {
+    /* neutrals — cool-biased toward the telemetry accent, not pure grey */
+    --bg: #e9edf1;
+    --surface: #ffffff;
+    --surface-2: #f3f6f9;
+    --text: #131a22;
+    --muted: #5b6773;
+    --line: #dbe2e9;
+    /* accent — telemetry teal (instrument console), distinct from status green */
+    --accent: #0d8497;
+    --accent-2: #0a6d7d;
+    --accent-soft: rgba(13, 132, 151, 0.12);
+    /* semantic status — reserved, never the brand accent */
+    --good: #2c8f66;
+    --good-soft: rgba(44, 143, 102, 0.13);
+    --warn: #b47d16;
+    --warn-soft: rgba(180, 125, 22, 0.14);
+    --chart-grid: rgba(19, 26, 34, 0.08);
+
+    --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", ui-monospace, monospace;
+
+    --maxw: 960px;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(19, 26, 34, 0.05), 0 6px 20px rgba(19, 26, 34, 0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a0f17;
+      --surface: #111b28;
+      --surface-2: #0d1622;
+      --text: #e7eef4;
+      --muted: #8a97a6;
+      --line: #1e2b3a;
+      --accent: #35bccf;
+      --accent-2: #59d0e0;
+      --accent-soft: rgba(53, 188, 207, 0.14);
+      --good: #43c08a;
+      --good-soft: rgba(67, 192, 138, 0.15);
+      --warn: #e0b24a;
+      --warn-soft: rgba(224, 178, 74, 0.16);
+      --chart-grid: rgba(231, 238, 244, 0.09);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #e9edf1; --surface: #ffffff; --surface-2: #f3f6f9; --text: #131a22;
+    --muted: #5b6773; --line: #dbe2e9; --accent: #0d8497; --accent-2: #0a6d7d;
+    --accent-soft: rgba(13,132,151,0.12); --good: #2c8f66; --good-soft: rgba(44,143,102,0.13);
+    --warn: #b47d16; --warn-soft: rgba(180,125,22,0.14); --chart-grid: rgba(19,26,34,0.08);
+    --shadow: 0 1px 2px rgba(19,26,34,0.05), 0 6px 20px rgba(19,26,34,0.06);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0f17; --surface: #111b28; --surface-2: #0d1622; --text: #e7eef4;
+    --muted: #8a97a6; --line: #1e2b3a; --accent: #35bccf; --accent-2: #59d0e0;
+    --accent-soft: rgba(53,188,207,0.14); --good: #43c08a; --good-soft: rgba(67,192,138,0.15);
+    --warn: #e0b24a; --warn-soft: rgba(224,178,74,0.16); --chart-grid: rgba(231,238,244,0.09);
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 26px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .page {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(1rem, 4vw, 3rem) 1rem 4rem;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.9rem;
+  }
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.1rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+    text-wrap: balance;
+    margin: 0 0 0.6rem;
+  }
+  h1 .dim { color: var(--muted); font-weight: 700; }
+  .lede {
+    font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+    color: var(--text);
+    max-width: 60ch;
+    margin: 0 0 1.4rem;
+  }
+  .metabar {
+    display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem;
+    font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted);
+    padding-top: 1.1rem; border-top: 1px solid var(--line);
+  }
+  .metabar b { color: var(--text); font-weight: 600; }
+
+  /* animated entrance, gentle and gated */
+  .fade { opacity: 0; transform: translateY(8px); animation: rise 0.6s ease forwards; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .fade { animation: none; opacity: 1; transform: none; } }
+
+  section { margin-top: clamp(2.4rem, 5vw, 3.4rem); }
+  h2 {
+    font-size: 1.35rem; letter-spacing: -0.01em; font-weight: 750;
+    margin: 0 0 0.3rem; display: flex; align-items: baseline; gap: 0.6rem;
+  }
+  h2 .num {
+    font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+  .section-sub { color: var(--muted); margin: 0 0 1.3rem; max-width: 62ch; }
+
+  /* KPI grid */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
+  @media (max-width: 640px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 1.1rem 1.15rem; box-shadow: var(--shadow);
+  }
+  .kpi .k-label {
+    font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.11em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 0.55rem;
+  }
+  .kpi .k-val {
+    font-size: 1.9rem; font-weight: 800; letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .kpi .k-val .arrow { color: var(--muted); font-weight: 600; margin: 0 0.15rem; }
+  .kpi .k-val .up { color: var(--good); }
+  .kpi .k-foot { font-size: 0.8rem; color: var(--muted); margin: 0.4rem 0 0; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: clamp(1.1rem, 3vw, 1.6rem);
+  }
+
+  /* callout */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 1.1rem 1.25rem;
+  }
+  .callout.good { border-left-color: var(--good); background: var(--good-soft); }
+  .callout h3 { margin: 0 0 0.35rem; font-size: 1rem; }
+  .callout p { margin: 0.35rem 0 0; color: var(--text); }
+  .callout code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+
+  /* chart */
+  .chart-wrap { overflow-x: auto; }
+  figure.chart { margin: 0; }
+  figure.chart svg { display: block; width: 100%; height: auto; min-width: 460px; }
+  figure.chart text { font-family: var(--font-mono); }
+  .c-grid { stroke: var(--chart-grid); stroke-width: 1; }
+  .c-axis { fill: var(--muted); }
+  .c-area { fill: var(--accent-soft); }
+  .c-line { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .c-pt { fill: var(--surface); stroke: var(--accent); stroke-width: 2.5; }
+  .c-end { fill: var(--accent); }
+  .c-val { fill: var(--text); font-weight: 700; }
+  .c-val-muted { fill: var(--muted); font-weight: 700; }
+  figcaption { font-size: 0.82rem; color: var(--muted); margin-top: 0.7rem; }
+
+  /* commit timeline */
+  .timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+  .commit {
+    position: relative; padding: 0 0 1.5rem 1.9rem; border-left: 2px solid var(--line);
+  }
+  .commit:last-child { border-left-color: transparent; padding-bottom: 0; }
+  .commit::before {
+    content: ""; position: absolute; left: -7px; top: 3px; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--surface); border: 2px solid var(--accent);
+  }
+  .commit.policy::before { border-color: var(--muted); }
+  .commit .c-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.7rem; }
+  .commit .hash {
+    font-family: var(--font-mono); font-size: 0.76rem; color: var(--accent);
+    background: var(--accent-soft); padding: 0.08rem 0.42rem; border-radius: 5px;
+  }
+  .commit .wp {
+    font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .commit .c-title { font-weight: 700; font-size: 1.02rem; margin: 0.25rem 0 0.2rem; }
+  .commit p { margin: 0.15rem 0 0.5rem; color: var(--muted); font-size: 0.93rem; }
+  .verify {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: var(--font-mono); font-size: 0.75rem; color: var(--good);
+    background: var(--good-soft); padding: 0.12rem 0.5rem; border-radius: 6px;
+  }
+
+  /* build grid */
+  .build-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+  @media (max-width: 640px) { .build-grid { grid-template-columns: 1fr; } }
+  .build {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.1rem 1.2rem; box-shadow: var(--shadow);
+  }
+  .build .b-tag {
+    font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 0.4rem;
+  }
+  .build h3 { margin: 0 0 0.4rem; font-size: 1.05rem; }
+  .build p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+  .build code { font-family: var(--font-mono); font-size: 0.85em; color: var(--text); }
+
+  /* next steps */
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; }
+  .steps li {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 0.85rem 1rem;
+  }
+  .pill {
+    flex: none; font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 999px; margin-top: 0.15rem;
+  }
+  .pill.open { color: var(--warn); background: var(--warn-soft); }
+  .pill.done { color: var(--good); background: var(--good-soft); }
+  .steps li p { margin: 0; font-size: 0.94rem; }
+  .steps li b { display: block; }
+
+  footer {
+    margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line);
+    font-size: 0.82rem; color: var(--muted);
+  }
+  footer .refs { font-family: var(--font-mono); font-size: 0.76rem; }
+  footer code { color: var(--text); }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+
+<div class="page">
+  <div class="wrap">
+
+    <header class="fade">
+      <p class="eyebrow">Build Report · Claude Code Session · 2026-07-16</p>
+      <h1>GrantNova <span class="dim">·</span> Grant&nbsp;Scout</h1>
+      <p class="lede">A single working session that renamed the system, brought its database under real migration control, and built the entire Grant&nbsp;Scout module — hunt, gather, evaluate, report — end to end and fully verified.</p>
+      <div class="metabar">
+        <span>branch <b>feat/grantnova-scout</b></span>
+        <span>tests <b>127&nbsp;→&nbsp;174</b></span>
+        <span>commits <b>7</b></span>
+        <span>db <b>Alembic&nbsp;@&nbsp;004</b></span>
+        <span>model <b>Opus&nbsp;4.8</b></span>
+      </div>
+    </header>
+
+    <!-- KPIs -->
+    <section aria-label="Key metrics">
+      <div class="kpis">
+        <div class="kpi">
+          <p class="k-label">Test suite</p>
+          <div class="k-val">127<span class="arrow">→</span><span class="up">174</span></div>
+          <p class="k-foot">+47 new tests, all green</p>
+        </div>
+        <div class="kpi">
+          <p class="k-label">Scout phases shipped</p>
+          <div class="k-val">4<span class="arrow">/</span>4</div>
+          <p class="k-foot">Hunt · Gather · Evaluate · Report</p>
+        </div>
+        <div class="kpi">
+          <p class="k-label">Commits this session</p>
+          <div class="k-val">7</div>
+          <p class="k-foot">one per work package</p>
+        </div>
+        <div class="kpi">
+          <p class="k-label">Database</p>
+          <div class="k-val">003<span class="arrow">→</span><span class="up">004</span></div>
+          <p class="k-foot">gmas.db → grantnova.db, under Alembic</p>
+        </div>
+        <div class="kpi">
+          <p class="k-label">Requirements written</p>
+          <div class="k-val">17<span style="font-size:1rem;color:var(--muted)">&nbsp;FR</span></div>
+          <p class="k-foot">FR-SCOUT + 7 NFR-SCOUT in PRD v1.2.0</p>
+        </div>
+        <div class="kpi">
+          <p class="k-label">Decisions logged</p>
+          <div class="k-val">5</div>
+          <p class="k-foot">D-020 → D-024, auditable</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Headline -->
+    <section>
+      <h2><span class="num">01</span> The headline</h2>
+      <div class="card">
+        <p style="margin:0 0 0.8rem">The session opened by installing the <b>Superpowers</b> plugin, then turned to the real objective: finishing the <b>Grant&nbsp;Scout</b> module — the discovery arm of GrantNova (formerly GMAS) that hunts for grants, gathers intelligence, evaluates fit, and reports back to the user. No paid AI, fully deterministic, human-in-the-loop throughout.</p>
+        <p style="margin:0">Work ran as an orchestrated plan of six work packages, each gated on <b>runnable acceptance criteria</b>. Every "done" was proven by re-running a command and reading its output — never by trusting a claim. The result: the module is built, 174 tests pass, and the database is — for the first time — genuinely migration-controlled.</p>
+      </div>
+    </section>
+
+    <!-- Chart -->
+    <section>
+      <h2><span class="num">02</span> Test coverage over the session</h2>
+      <p class="section-sub">The suite grew from 127 to 174 as each work package landed with its own tests. Nothing merged on a red suite.</p>
+      <div class="card">
+        <div class="chart-wrap">
+          <figure class="chart">
+            <svg viewBox="0 0 640 240" role="img" aria-label="Line chart of passing test count rising from 127 at session start to 174 by the final work package.">
+              <!-- gridlines -->
+              <g class="c-grid">
+                <line x1="60" y1="171.7" x2="600" y2="171.7"/>
+                <line x1="60" y1="115" x2="600" y2="115"/>
+                <line x1="60" y1="58.3" x2="600" y2="58.3"/>
+              </g>
+              <g class="c-axis" font-size="11" text-anchor="end">
+                <text x="50" y="175.5">130</text>
+                <text x="50" y="118.5">150</text>
+                <text x="50" y="61.8">170</text>
+              </g>
+              <!-- area -->
+              <path class="c-area" d="M60,180.2 L195,174.5 L330,92.3 L465,61.2 L600,47 L600,200 L60,200 Z"/>
+              <!-- line -->
+              <path class="c-line" d="M60,180.2 L195,174.5 L330,92.3 L465,61.2 L600,47"/>
+              <!-- points -->
+              <g class="c-pt">
+                <circle cx="60" cy="180.2" r="4"/>
+                <circle cx="195" cy="174.5" r="4"/>
+                <circle cx="330" cy="92.3" r="4"/>
+                <circle cx="465" cy="61.2" r="4"/>
+              </g>
+              <!-- emphasized endpoint -->
+              <circle class="c-end" cx="600" cy="47" r="6"/>
+              <!-- value labels -->
+              <g font-size="12" text-anchor="middle">
+                <text class="c-val-muted" x="60" y="197">127</text>
+                <text class="c-val" x="600" y="36">174</text>
+              </g>
+              <!-- x labels -->
+              <g class="c-axis" font-size="10.5" text-anchor="middle">
+                <text x="60" y="222">Start</text>
+                <text x="195" y="222">WP-1</text>
+                <text x="330" y="222">WP-2</text>
+                <text x="465" y="222">WP-4</text>
+                <text x="600" y="222">WP-5/6</text>
+              </g>
+            </svg>
+          </figure>
+        </div>
+        <figcaption>Passing tests after each work package · +2 migration guards, +29 discovery, +11 evaluate, +5 report.</figcaption>
+      </div>
+    </section>
+
+    <!-- Verification model -->
+    <section>
+      <h2><span class="num">03</span> How "done" was proven</h2>
+      <div class="callout">
+        <h3>Acceptance criteria → runnable VERIFY command → orchestrator re-runs it</h3>
+        <p>Every requirement carried an acceptance criterion ending in a command that produces observable output (a specific <code>pytest</code> run, an <code>alembic</code> check, a row-count parity query). A task counted as done only when that command was re-run and its output read — a direct answer to the standing rule that subagents can hallucinate. Discovery of this session's one real infrastructure bug came straight out of that discipline.</p>
+      </div>
+    </section>
+
+    <!-- Notable find -->
+    <section>
+      <h2><span class="num">04</span> The bug the migration workout uncovered</h2>
+      <div class="callout good">
+        <h3>The live database was never actually under Alembic</h3>
+        <p>The app built its schema with <code>create_all()</code>, not migrations — so the real <code>gmas.db</code> had no <code>alembic_version</code> table and was <b>missing the entire <code>discovered_candidates</code> table</b> the Scout depends on. Models and migrations were two sources of truth that had already drifted. The rename became the fix: back up → rebuild a canonical DB from the 001→004 chain → copy the real data across (32 funders, 14 templates, 1 org, 1 criteria) with verified parity → retire the old file. A permanent drift-guard test now fails if models and migrations ever diverge again.</p>
+      </div>
+    </section>
+
+    <!-- Commit timeline -->
+    <section>
+      <h2><span class="num">05</span> Commit-by-commit</h2>
+      <p class="section-sub">Seven commits, one per work package, each on a green suite — so any decision can be reverted incrementally.</p>
+      <ol class="timeline">
+        <li class="commit">
+          <div class="c-head"><span class="hash">ef7728c</span><span class="wp">WP-1 · Foundation</span></div>
+          <p class="c-title">Rename GMAS → GrantNova + database under Alembic control</p>
+          <p>99 references across 40 files; <code>gmas.db</code> → <code>grantnova.db</code> rebuilt from the migration chain with a backup, WAL checkpoint, and a data-copy script. Added a reversibility + drift-guard test.</p>
+          <span class="verify">✓ 129 passed · AC-REN + AC-DB met</span>
+        </li>
+        <li class="commit">
+          <div class="c-head"><span class="hash">2f16109</span><span class="wp">WP-2 · Hardening</span></div>
+          <p class="c-title">Test-harden the discovery subsystem (+29 tests)</p>
+          <p>Closed the biggest risk: the previously-untested orchestrator, polite fetcher, and three source connectors — all with the network mocked (robots, rate-limit, cache, ToS-domain blocking, staging, de-dup, import).</p>
+          <span class="verify">✓ 158 passed</span>
+        </li>
+        <li class="commit policy">
+          <div class="c-head"><span class="hash">1186ac2</span><span class="wp">Working agreement</span></div>
+          <p class="c-title">Per-WP commit cadence + autonomous-decision logging</p>
+          <p>Adopted frequent per-package commits for incremental reversibility, and a rule that every autonomous judgment call is written to the Disambiguation Record.</p>
+          <span class="verify">✓ policy / docs</span>
+        </li>
+        <li class="commit">
+          <div class="c-head"><span class="hash">ac01aa9</span><span class="wp">WP-4 · Evaluate</span></div>
+          <p class="c-title">Pre-review scoring, eligibility, ranked green queue</p>
+          <p>Candidates are now scored the moment they're staged — reusing the existing engine (no new math). Eligibility honors the fiscal-sponsorship lifeline; strong eligible matches rank first with a green flag; an "Act Now" flag fires on near deadlines. Migration 004, reversible.</p>
+          <span class="verify">✓ 169 passed · nothing auto-imports</span>
+        </li>
+        <li class="commit">
+          <div class="c-head"><span class="hash">17c1035</span><span class="wp">WP-5 · Report</span></div>
+          <p class="c-title">Weekly intelligence digest</p>
+          <p>A read-only digest led by Act Now items, then strong matches. Low-confidence extracted fields render as "(unverified)" so a guess is never presented as fact. Available in the UI and from the CLI scan.</p>
+          <span class="verify">✓ 174 passed</span>
+        </li>
+        <li class="commit">
+          <div class="c-head"><span class="hash">42432fd</span><span class="wp">WP-6a · Interface</span></div>
+          <p class="c-title">🛰️ Grant Scout page — ranked queue + report tab</p>
+          <p>Reframed the Discover page: best-first queue with 🟢 strong-match flags and a hide-ineligible toggle, plus a Report tab that generates and downloads the digest. Verified by rendering the page headlessly.</p>
+          <span class="verify">✓ renders via Streamlit AppTest</span>
+        </li>
+        <li class="commit">
+          <div class="c-head"><span class="hash">8963ca4</span><span class="wp">WP-6b · Documentation</span></div>
+          <p class="c-title">PRD v1.2.0 + HLD v1.2.0 with FR-SCOUT / NFR-SCOUT</p>
+          <p>Formalized 17 functional + 7 non-functional Scout requirements and a subsystem architecture section; archived the v1.1.0 documents.</p>
+          <span class="verify">✓ 25 FR-SCOUT refs · v1.1.0 archived</span>
+        </li>
+      </ol>
+    </section>
+
+    <!-- What got built -->
+    <section>
+      <h2><span class="num">06</span> What the Scout does</h2>
+      <p class="section-sub">Four phases, each a small deterministic component the orchestrator wires together — no paid AI anywhere in the path.</p>
+      <div class="build-grid">
+        <div class="build">
+          <p class="b-tag">Hunt</p>
+          <h3>Find opportunities</h3>
+          <p>grants.gov API, keyless web search, funder-site sweeps and public portals; the org profile expands into up to 40 deterministic queries for a "search everywhere" run.</p>
+        </div>
+        <div class="build">
+          <p class="b-tag">Gather</p>
+          <h3>Collect intelligence</h3>
+          <p>A polite fetcher honors robots.txt, rate-limits per host, and caches to disk; a rules-based extractor pulls fields with a confidence score and evidence snippet for each.</p>
+        </div>
+        <div class="build">
+          <p class="b-tag">Evaluate</p>
+          <h3>Assess fit before review</h3>
+          <p>Fit score + eligibility (incl. fiscal sponsorship) computed at stage time; the queue ranks strong eligible matches first and flags what's closing soon — green, never alarm-red.</p>
+        </div>
+        <div class="build">
+          <p class="b-tag">Report</p>
+          <h3>Brief the user</h3>
+          <p>A weekly digest, Act-Now first, honest about unverified fields — from the same DB state, in the UI or the CLI. Read-only: it never changes a candidate.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Next steps -->
+    <section>
+      <h2><span class="num">07</span> Where it stands & what's next</h2>
+      <p class="section-sub">The module is complete on its branch. Nothing is pushed or merged — that's the owner's call.</p>
+      <ul class="steps">
+        <li><span class="pill done">Ready</span><p><b>Run &amp; test the Scout tomorrow</b> — launch the app, run a search to populate the ranked queue, and eyeball the green flags, report tab, and import flow. Full steps live in the next-session handoff.</p></li>
+        <li><span class="pill open">Open</span><p><b>Integrate the branch</b> — open a PR or merge <code class="mono">feat/grantnova-scout</code> into <code class="mono">main</code> when satisfied.</p></li>
+        <li><span class="pill open">Open</span><p><b>Deferred docs (D-024)</b> — bump Detailed Design + Overview to v1.2.0; Scout detail currently lives authoritatively in the Task Implementation Plan.</p></li>
+        <li><span class="pill open">Watch</span><p><b>First-run risk</b> — if every fit score reads 0.0, the seeded active selection-criteria may not be in the scoring engine's config format; flag it and adjust the seed.</p></li>
+      </ul>
+    </section>
+
+    <footer>
+      <p class="refs">references&nbsp;·&nbsp; <code>05_Grant_Scout_Task_Implementation_Plan_v1.0.0.md</code> &nbsp;·&nbsp; <code>01_PRD_v1.2.0.md §2.13</code> &nbsp;·&nbsp; <code>02_High_Level_Design_v1.2.0.md §14</code> &nbsp;·&nbsp; <code>DISAMBIGUATION_RECORD_v1.0.md D-020→D-024</code> &nbsp;·&nbsp; <code>NEXT_SESSION_HANDOFF_2026-07-16.md</code></p>
+      <p>GrantNova · Grant Scout build report · generated from session <code class="mono">c46dbd7d</code> · 2026-07-16.</p>
+    </footer>
+
+  </div>
+</div>
+
+</body>
+</html>
