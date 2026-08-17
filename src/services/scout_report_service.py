@@ -54,19 +54,23 @@ def _jinja_env() -> Environment:
 
 
 class ScoutReportService:
+    def list_ranked_candidates(
+        self, db: Session, since: date | None = None, limit: int | None = None
+    ) -> list[dict]:
+        """
+        Return candidates awaiting review as best-first view dicts (title, funder,
+        deadline, url, ...). Same ranking and field formatting as the digest, for
+        consumers that need the items rather than rendered markdown (e.g. the
+        weekly email). `limit` caps the list after ranking. Read-only.
+        """
+        return [self._view(r) for r in self._ranked_rows(db, since)[: limit or None]]
+
     def generate_report(self, db: Session, since: date | None = None) -> ScoutReport:
         """
         Build the Scout intelligence digest from candidates awaiting review.
         `since` (defaults to none = all NEW) filters by discovery date. Read-only.
         """
-        q = db.query(DiscoveredCandidate).filter(
-            DiscoveredCandidate.is_deleted.is_(False),
-            DiscoveredCandidate.status == CandidateStatus.NEW,
-        )
-        if since is not None:
-            q = q.filter(DiscoveredCandidate.discovered_at >= datetime(since.year, since.month, since.day))
-        rows = q.all()
-        rows.sort(key=DiscoveryService._rank_key)  # best-first, shared with the queue
+        rows = self._ranked_rows(db, since)
 
         act_now = [r for r in rows if r.act_now]
         strong = [r for r in rows if r.is_strong_match and not r.act_now]
@@ -91,6 +95,24 @@ class ScoutReportService:
             act_now=len(act_now),
             generated_at=generated_at,
         )
+
+    # ── shared ranking ─────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _ranked_rows(db: Session, since: date | None = None) -> list[DiscoveredCandidate]:
+        """Candidates awaiting review, best-first. Single source of ranking truth."""
+        q = db.query(DiscoveredCandidate).filter(
+            DiscoveredCandidate.is_deleted.is_(False),
+            DiscoveredCandidate.status == CandidateStatus.NEW,
+        )
+        if since is not None:
+            q = q.filter(
+                DiscoveredCandidate.discovered_at
+                >= datetime(since.year, since.month, since.day)
+            )
+        rows = q.all()
+        rows.sort(key=DiscoveryService._rank_key)  # best-first, shared with the queue
+        return rows
 
     # ── view-model builder ─────────────────────────────────────────────────────
 

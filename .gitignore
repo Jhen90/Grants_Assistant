@@ -47,6 +47,9 @@ logs/
 # Exports (generated at runtime)
 data/exports/
 
+# Discovery scrape cache (generated at runtime)
+data/discovery_cache/
+
 # IDE
 .vscode/
 *.code-workspace
